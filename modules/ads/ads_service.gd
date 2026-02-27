@@ -1,20 +1,33 @@
 class_name AdsService extends GlapiService
 
+# Señales que el juego podrá escuchar o "esperar" (await)
+signal ad_loaded(format: AdsProvider.AdFormat)
+signal ad_failed_to_load(format: AdsProvider.AdFormat, error_msg: String)
+signal ad_closed(format: AdsProvider.AdFormat)
+signal ad_rewarded(format: AdsProvider.AdFormat, reward_type: String, reward_amount: int)
+
 func _init(provider: AdsProvider) -> void:
 	_provider = provider
 	_provider.initialize()
 	
-	# Conectar las señales de la infraestructura para convertirlas en eventos de dominio
+	# Conectamos las señales del provider hacia el servicio
+	_provider.ad_loaded.connect(func(f): ad_loaded.emit(f))
+	_provider.ad_failed_to_load.connect(func(f, e): ad_failed_to_load.emit(f, e))
 	_provider.ad_closed.connect(_on_provider_ad_closed)
 	_provider.ad_rewarded.connect(_on_provider_ad_rewarded)
+	
+	# Esta es la conexión especial que comunica Ads con Analytics
 	_provider.ad_impression_recorded.connect(_on_provider_ad_impression)
 
-func handle_event(event: GlapiEvent) -> void:
-	# Interceptar peticiones que vienen del juego
-	if event is ShowAdRequestedEvent:
-		var req_event = event as ShowAdRequestedEvent
-		var format = _parse_format_string(req_event.format_requested)
-		_provider.show_ad(format)
+# --- Métodos Directos (Reemplazan a handle_event) ---
+
+func load_ad(format_str: String, ad_unit_id: String = "") -> void:
+	var format = _parse_format_string(format_str)
+	_provider.load_ad(format, ad_unit_id)
+
+func show_ad(format_str: String) -> void:
+	var format = _parse_format_string(format_str)
+	_provider.show_ad(format)
 
 # --- Funciones Auxiliares ---
 
@@ -28,19 +41,20 @@ func _parse_format_string(format_str: String) -> AdsProvider.AdFormat:
 		"app_open": return AdsProvider.AdFormat.APP_OPEN
 		_:
 			push_error("AdsService: Formato no reconocido -> " + format_str)
-			return AdsProvider.AdFormat.INTERSTITIAL # Fallback seguro
+			return AdsProvider.AdFormat.INTERSTITIAL
 
-# --- Callbacks del Provider (De la Infraestructura hacia el Dominio) ---
+# --- Callbacks del Provider ---
 
-func _on_provider_ad_closed(_format: AdsProvider.AdFormat) -> void:
-	# Avisar al juego que puede quitar la pausa
-	Glapi.dispatch(AdClosedEvent.new())
+func _on_provider_ad_closed(format: AdsProvider.AdFormat) -> void:
+	# Emitimos la señal local del servicio para que el juego la atrape (await)
+	ad_closed.emit(format)
 
-func _on_provider_ad_rewarded(_format: AdsProvider.AdFormat, reward_type: String, reward_amount: int) -> void:
-	# Otorgar la recompensa en el juego
-	Glapi.dispatch(AdRewardedEvent.new(reward_type, reward_amount))
+func _on_provider_ad_rewarded(format: AdsProvider.AdFormat, reward_type: String, reward_amount: int) -> void:
+	# Emitimos la señal local para dar la recompensa
+	ad_rewarded.emit(format, reward_type, reward_amount)
 
 func _on_provider_ad_impression(format_name: String, ad_unit_name: String, currency: String, value: float) -> void:
-	# Magia de la arquitectura: 
-	# Al despachar esto, el `AnalyticsService` lo atrapará automáticamente y lo enviará a Firebase.
+	# 🌟 ARQUITECTURA LIMPIA EN ACCIÓN 🌟
+	# Esto alimenta a Firebase/Analítica sin que el desarrollador mueva un dedo en el código del juego.
+	# (Asegúrate de que Glapi.gd sea accesible globalmente o usa la ruta correcta si tu autoload se llama de otra forma).
 	Glapi.dispatch(AdImpressionEvent.new(format_name, ad_unit_name, currency, value))
