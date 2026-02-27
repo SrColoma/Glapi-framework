@@ -71,6 +71,24 @@ graph TD
 - **Centralizado:** El autoload `auto_Glapi` actúa como el único punto de entrada y configuración, simplificando el arranque.
 
 ---
+## Instalación
+
+### Añadir el Framework al Proyecto
+
+Tienes dos opciones para añadir los archivos de Glapi a tu proyecto.
+
+#### Opción A: Git Submodule (Recomendado)
+Si tu proyecto usa Git, la forma más limpia es añadir Glapi como un submódulo. Abre una terminal en la raíz de tu proyecto y ejecuta:
+```bash
+# Se creará una carpeta 'framework' en la raiz del proyecto
+git submodule add https://github.com/SrColoma/Glapi-framework.git framework
+```
+
+#### Opción B: Copia Manual
+1.  Descarga este repositorio como un archivo ZIP desde la página de GitHub.
+2.  Descomprime el archivo.
+3.  Copia la carpeta completa (`Glapi-framework`) dentro de tu proyecto de Godot, por ejemplo, en `res://framework/`.
+---
 
 ## ¿Cómo Empezar?
 
@@ -186,3 +204,8 @@ func to_dict() -> Dictionary:
         "weapon_used": weapon_used
     }
 ```
+
+
+### importar framework a godot
+
+git submodule add github.com/SrColoma/Glapi-framework Glapi-framework
