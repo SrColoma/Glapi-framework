@@ -1,7 +1,8 @@
 class_name GlapiEvent extends RefCounted
 
-var event_name: String = "generic_event"
+var event_name: String
+var parameters: Dictionary
 
-func to_dict() -> Dictionary:
-	push_error("GlapiEvent: La función to_dict() debe ser sobrescrita por la clase hija.")
-	return {}
+func _init(name: String, params: Dictionary = {}) -> void:
+	event_name = name
+	parameters = params
