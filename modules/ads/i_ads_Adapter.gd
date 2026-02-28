@@ -1,4 +1,4 @@
-class_name IAdsProvider extends GlapiProvider
+class_name IAdsAdapter extends GlapiAdapter
 
 enum AdFormat {
 	BANNER,

@@ -1,4 +1,4 @@
-class_name MockAdsProvider extends IAdsProvider
+class_name MockAdsAdapter extends IAdsAdapter
 
 var _mock_native_canvas: CanvasLayer
 var _mock_banner_canvas: CanvasLayer

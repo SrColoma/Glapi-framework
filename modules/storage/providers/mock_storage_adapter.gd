@@ -1,4 +1,4 @@
-class_name MockStorageProvider extends IStorageProvider
+class_name MockStorageAdapter extends IStorageAdapter
 
 # Diccionarios temporales que solo vivirán mientras el juego esté abierto
 var _mock_settings: Dictionary = {}

@@ -18,7 +18,7 @@ const DEFAULT_STATE = {
 	"last_login": ""
 }
 
-func _init(provider: IStorageProvider) -> void:
+func _init(provider: IStorageAdapter) -> void:
 	_provider = provider
 	_provider.initialize()
 	

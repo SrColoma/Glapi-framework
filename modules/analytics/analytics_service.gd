@@ -1,6 +1,6 @@
 class_name AnalyticsService extends GlapiService
 
-func _init(provider: IAnalyticsProvider) -> void:
+func _init(provider: IAnalyticsAdapter) -> void:
 	_provider = provider
 	_provider.initialize()
 

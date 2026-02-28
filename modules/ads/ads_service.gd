@@ -1,15 +1,15 @@
 class_name AdsService extends GlapiService
 
-const AdFormat = IAdsProvider.AdFormat
-const BannerPosition = IAdsProvider.BannerPosition
+const AdFormat = IAdsAdapter.AdFormat
+const BannerPosition = IAdsAdapter.BannerPosition
 
 # Señales que el juego podrá escuchar o "esperar" (await)
-signal ad_loaded(format: IAdsProvider.AdFormat)
-signal ad_failed_to_load(format: IAdsProvider.AdFormat, error_msg: String)
-signal ad_closed(format: IAdsProvider.AdFormat)
-signal ad_rewarded(format: IAdsProvider.AdFormat, reward_type: String, reward_amount: int)
+signal ad_loaded(format: IAdsAdapter.AdFormat)
+signal ad_failed_to_load(format: IAdsAdapter.AdFormat, error_msg: String)
+signal ad_closed(format: IAdsAdapter.AdFormat)
+signal ad_rewarded(format: IAdsAdapter.AdFormat, reward_type: String, reward_amount: int)
 
-func _init(provider: IAdsProvider) -> void:
+func _init(provider: IAdsAdapter) -> void:
 	_provider = provider
 	_provider.initialize()
 	
@@ -24,7 +24,7 @@ func _init(provider: IAdsProvider) -> void:
 
 # --- Métodos Directos (Reemplazan a handle_event) ---
 
-func load_ad(format_str: String, ad_unit_id: String = "", position: IAdsProvider.BannerPosition = IAdsProvider.BannerPosition.BOTTOM) -> void:
+func load_ad(format_str: String, ad_unit_id: String = "", position: IAdsAdapter.BannerPosition = IAdsAdapter.BannerPosition.BOTTOM) -> void:
 	var format = _parse_format_string(format_str)
 	_provider.load_ad(format, ad_unit_id, position)
 
@@ -45,25 +45,25 @@ func destroy_ad(format_str: String) -> void:
 
 # --- Funciones Auxiliares ---
 
-func _parse_format_string(format_str: String) -> IAdsProvider.AdFormat:
+func _parse_format_string(format_str: String) -> IAdsAdapter.AdFormat:
 	match format_str.to_lower():
-		"banner": return IAdsProvider.AdFormat.BANNER
-		"interstitial": return IAdsProvider.AdFormat.INTERSTITIAL
-		"rewarded": return IAdsProvider.AdFormat.REWARDED
-		"rewarded_interstitial": return IAdsProvider.AdFormat.REWARDED_INTERSTITIAL
-		"native": return IAdsProvider.AdFormat.NATIVE
-		"app_open": return IAdsProvider.AdFormat.APP_OPEN
+		"banner": return IAdsAdapter.AdFormat.BANNER
+		"interstitial": return IAdsAdapter.AdFormat.INTERSTITIAL
+		"rewarded": return IAdsAdapter.AdFormat.REWARDED
+		"rewarded_interstitial": return IAdsAdapter.AdFormat.REWARDED_INTERSTITIAL
+		"native": return IAdsAdapter.AdFormat.NATIVE
+		"app_open": return IAdsAdapter.AdFormat.APP_OPEN
 		_:
 			push_error("AdsService: Formato no reconocido -> " + format_str)
-			return IAdsProvider.AdFormat.INTERSTITIAL
+			return IAdsAdapter.AdFormat.INTERSTITIAL
 
 # --- Callbacks del Provider ---
 
-func _on_provider_ad_closed(format: IAdsProvider.AdFormat) -> void:
+func _on_provider_ad_closed(format: IAdsAdapter.AdFormat) -> void:
 	# Emitimos la señal local del servicio para que el juego la atrape (await)
 	ad_closed.emit(format)
 
-func _on_provider_ad_rewarded(format: IAdsProvider.AdFormat, reward_type: String, reward_amount: int) -> void:
+func _on_provider_ad_rewarded(format: IAdsAdapter.AdFormat, reward_type: String, reward_amount: int) -> void:
 	# Emitimos la señal local para dar la recompensa
 	ad_rewarded.emit(format, reward_type, reward_amount)
 

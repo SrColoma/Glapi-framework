@@ -1,4 +1,4 @@
-class_name LocalHybridStorageProvider extends IStorageProvider
+class_name LocalHybridStorageAdapter extends IStorageAdapter
 
 const SETTINGS_PATH = "user://settings.cfg"
 const STATE_PATH = "user://player_data.save"

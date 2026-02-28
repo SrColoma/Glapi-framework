@@ -1,4 +1,4 @@
-class_name MockAnalyticsProvider extends IAnalyticsProvider
+class_name MockAnalyticsAdapter extends IAnalyticsAdapter
 
 func initialize() -> void:
 	print("🔵 MOCK ANALYTICS: SDK Inicializado.")

@@ -1,4 +1,4 @@
-class_name FirebaseAnalyticsProvider extends IAnalyticsProvider
+class_name FirebaseAnalyticsAdapter extends IAnalyticsAdapter
 
 var _is_initialized: bool = false
 var _firebase: Object
