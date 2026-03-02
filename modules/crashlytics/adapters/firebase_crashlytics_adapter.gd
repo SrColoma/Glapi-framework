@@ -12,7 +12,7 @@ func initialize() -> void:
 		_is_initialized = false
 		push_warning("⚠️ CRASHLYTICS: Singleton 'FirebaseCrashlytics' no encontrado.")
 
-func record_exception(message: String) -> void:
+func record_exception(message: String, description: String) -> void:
 	if not _is_initialized: return
 	if _firebase.has_method("recordException"):
 		_firebase.recordException(message)

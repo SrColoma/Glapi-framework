@@ -20,8 +20,7 @@ func initialize() -> void:
 	print("🟡 MOCK ADS: SDK Inicializado.")
 
 # --- 1. Carga de Anuncios ---
-
-func load_ad(format: AdFormat, ad_unit_id: String = "mock_unit_id", position: BannerPosition = BannerPosition.BOTTOM) -> void:
+func load_ad(format: AdFormat, ad_unit_id: String = "", position: BannerPosition = BannerPosition.BOTTOM, size: BannerSize = BannerSize.BANNER) -> void:
 	var format_name = AdFormat.keys()[format]
 	print("⏳ MOCK ADS: Solicitando red para [", format_name, "]...")
 	
@@ -29,7 +28,8 @@ func load_ad(format: AdFormat, ad_unit_id: String = "mock_unit_id", position: Ba
 	await Engine.get_main_loop().create_timer(0.5).timeout
 	
 	if format == AdFormat.BANNER:
-		_setup_visual_mock_banner(position)
+		# 🌟 CORREGIDO: Ahora le pasamos la posición Y el tamaño
+		_setup_visual_mock_banner(position, size)
 	
 	# Marcamos como cargado y avisamos al sistema
 	_loaded_ads[format] = true
@@ -133,7 +133,10 @@ func _show_visual_fullscreen_ad(format: AdFormat, format_name: String) -> void:
 
 # --- 4. Funciones Auxiliares para el Banner Visual ---
 
-func _setup_visual_mock_banner(pos: BannerPosition) -> void:
+# --- 4. Funciones Auxiliares para el Banner Visual ---
+
+# 🌟 CORREGIDO: Añadimos 'size: BannerSize' a los parámetros
+func _setup_visual_mock_banner(pos: BannerPosition, size: BannerSize) -> void:
 	if is_instance_valid(_mock_banner_canvas):
 		_mock_banner_canvas.queue_free()
 		
@@ -146,14 +149,19 @@ func _setup_visual_mock_banner(pos: BannerPosition) -> void:
 	container.mouse_filter = Control.MOUSE_FILTER_IGNORE 
 	_mock_banner_canvas.add_child(container)
 	
+	# 🌟 NUEVO: Obtenemos el tamaño en píxeles
+	var dimensions = _get_mock_size_vector(size)
+	
 	_banner_rect = ColorRect.new()
 	_banner_rect.color = Color(0.15, 0.15, 0.15, 0.9)
-	_banner_rect.custom_minimum_size = Vector2(320, 50)
-	_banner_rect.size = Vector2(320, 50)
+	# 🌟 APLICAMOS LAS DIMENSIONES AQUÍ
+	_banner_rect.custom_minimum_size = dimensions
+	_banner_rect.size = dimensions
 	_banner_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	
 	var label = Label.new()
-	label.text = "TEST BANNER - GLAPI"
+	# 🌟 EXTRA: Hacemos que el texto muestre el nombre del tamaño para que sea más claro
+	label.text = "TEST BANNER\n" + BannerSize.keys()[size]
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -284,3 +292,14 @@ func _show_visual_mock_native() -> void:
 	
 	_mock_native_canvas.add_child(panel)
 	Engine.get_main_loop().current_scene.add_child(_mock_native_canvas)
+
+
+# 🌟 NUEVO: Traductor de Enum a Vector2 (píxeles reales de AdMob)
+func _get_mock_size_vector(size: BannerSize) -> Vector2:
+	match size:
+		BannerSize.BANNER: return Vector2(320, 50)
+		BannerSize.LARGE_BANNER: return Vector2(320, 100)
+		BannerSize.MEDIUM_RECTANGLE: return Vector2(300, 250)
+		BannerSize.FULL_BANNER: return Vector2(468, 60)
+		BannerSize.LEADERBOARD: return Vector2(728, 90)
+		_: return Vector2(320, 50)

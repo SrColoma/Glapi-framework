@@ -18,9 +18,9 @@ const DEFAULT_STATE = {
 	"last_login": ""
 }
 
-func _init(provider: IStorageAdapter) -> void:
-	_provider = provider
-	_provider.initialize()
+func _init(adapter: IStorageAdapter) -> void:
+	_adapter = adapter
+	_adapter.initialize()
 	
 	# Cargamos los datos del disco a la memoria al iniciar
 	_load_all()
@@ -46,17 +46,17 @@ func set_setting(key: String, value: Variant, auto_save: bool = true) -> void:
 # --- Métodos de sincronización con el disco ---
 
 func save_all_state() -> void:
-	_provider.save_state(state)
+	_adapter.save_state(state)
 
 func save_all_settings() -> void:
-	_provider.save_settings(settings)
+	_adapter.save_settings(settings)
 
 func _load_all() -> void:
 	# Mezclamos los datos guardados con los defaults, por si añadiste nuevas variables en una actualización
-	var loaded_settings = _provider.load_settings()
+	var loaded_settings = _adapter.load_settings()
 	settings = DEFAULT_SETTINGS.duplicate(true)
 	settings.merge(loaded_settings, true)
 	
-	var loaded_state = _provider.load_state()
+	var loaded_state = _adapter.load_state()
 	state = DEFAULT_STATE.duplicate(true)
 	state.merge(loaded_state, true)
