@@ -1,23 +1,24 @@
 @tool
 extends EditorPlugin
 
-# El nombre con el que lo llamarás en todo tu código
-const AUTOLOAD_NAME = "Glapi" 
+const AUTOLOAD_NAME = "Glapi"
+
+var _autoload_registered_by_plugin: bool = false
 
 func _enter_tree() -> void:
-	# Obtenemos la ruta dinámica de la carpeta donde está guardado este plugin.gd
-	#var executable_path = OS.get_executable_path()
-	#var base_dir = executable_path.get_base_dir()
-	var base_dir = get_script().get_base_dir()
+	var autoload_path = "res://addons/Glapi/auto_Glapi.gd"
 	
-	# Construimos la ruta exacta al Autoload concatenando el nombre del archivo
-	var autoload_path = base_dir + "/auto_Glapi.gd"
-
-	# Añade el Autoload automáticamente usando la ruta segura
-	add_autoload_singleton(AUTOLOAD_NAME, autoload_path)
-	print("🟢 Glapi Plugin: Autoload '" + AUTOLOAD_NAME + "' registrado correctamente en: ", autoload_path)
+	if ProjectSettings.has_setting("autoload/" + AUTOLOAD_NAME):
+		print("🟡 Glapi Plugin: Autoload '" + AUTOLOAD_NAME + "' ya existe en project.godot.")
+	else:
+		add_autoload_singleton(AUTOLOAD_NAME, autoload_path)
+		_autoload_registered_by_plugin = true
+		print("🟢 Glapi Plugin: Autoload '" + AUTOLOAD_NAME + "' registrado correctamente.")
 
 func _exit_tree() -> void:
-	# Limpia el Autoload para no dejar basura en el proyecto al desactivar el plugin
-	remove_autoload_singleton(AUTOLOAD_NAME)
-	print("🔴 Glapi Plugin: Autoload '" + AUTOLOAD_NAME + "' removido.")
+	if _autoload_registered_by_plugin:
+		remove_autoload_singleton(AUTOLOAD_NAME)
+		_autoload_registered_by_plugin = false
+		print("🔴 Glapi Plugin: Autoload '" + AUTOLOAD_NAME + "' removido.")
+	else:
+		print("🟡 Glapi Plugin: Autoload '" + AUTOLOAD_NAME + "' se mantiene (definido en project.godot).")
