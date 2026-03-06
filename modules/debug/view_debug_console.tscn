@@ -1,0 +1,63 @@
+[gd_scene load_steps=3 format=3 uid="uid://de9f1w38q"]
+
+[ext_resource type="Script" path="res://addons/glapi/modules/debug/view_debug_console.gd" id="1_hx7t9"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_o0v8y"]
+bg_color = Color(0, 0, 0, 0.784314)
+border_width_bottom = 2
+border_color = Color(0.2, 0.6, 0.4, 1)
+
+[node name="ViewDebugConsole" type="Control"]
+layout_mode = 3
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+script = ExtResource("1_hx7t9")
+
+[node name="PanelTop" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 250.0
+grow_horizontal = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_o0v8y")
+
+[node name="VBox" type="VBoxContainer" parent="PanelTop"]
+layout_mode = 2
+
+[node name="ScrollLogs" type="ScrollContainer" parent="PanelTop/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="RichLogList" type="RichTextLabel" parent="PanelTop/VBox/ScrollLogs"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_fonts/normal_font = null
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+scroll_following = true
+
+[node name="HBoxInput" type="HBoxContainer" parent="PanelTop/VBox"]
+layout_mode = 2
+
+[node name="LabelCarrot" type="Label" parent="PanelTop/VBox/HBoxInput"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.2, 1, 0.2, 1)
+theme_override_font_sizes/font_size = 18
+text = ">"
+
+[node name="LineEditCmd" type="LineEdit" parent="PanelTop/VBox/HBoxInput"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.9, 0.9, 0.9, 1)
+theme_override_font_sizes/font_size = 16
+placeholder_text = "Escribe un comando... (ej: help)"
+caret_blink = true
+
+[node name="BtnSubmit" type="Button" parent="PanelTop/VBox/HBoxInput"]
+layout_mode = 2
+text = "Enter"

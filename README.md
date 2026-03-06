@@ -15,13 +15,14 @@ Su **arquitectura híbrida** combina el patrón **Adapter** (Servicio → Interf
 | **Remote Config** | `Glapi.remote_config` | Configuración remota (Firebase) |
 | **IAP** | `Glapi.iap` | Compras in-app (Google Play Billing) |
 | **Game Services** | `Glapi.game_services` | Logros y leaderboards (Google Play Games) |
+| **Scene Transition** | `Glapi.scene_transition` | Transiciones de escena (fade, slide) |
 
 ## Arquitectura
 
 ```
 Juego → Glapi (Autoload) → Servicios → Adapters → SDKs
-                                    ↓
-                              Mock Adapters (testing)
+                              ↓
+                        Mock Adapters (testing)
 ```
 
 - **Servicio**: Lógica de negocio (ej. `AdsService`)
@@ -96,6 +97,44 @@ Glapi.storage.save_data("settings", {"sound": true, "music": 0.8})
 var settings = Glapi.storage.load_data("settings")
 ```
 
+### Transiciones de Escena
+
+**SceneTransition** es parte de Glapi (`Glapi.scene_transition`). No requiere inicialización separate, se configura automáticamente.
+
+```gdscript
+# Transiciones disponibles:
+# "res://addons/Glapi/modules/scene_transition/transitions/fade_black.tscn" (por defecto)
+# "res://addons/Glapi/modules/scene_transition/transitions/fade_white.tscn"
+
+# Cambiar escena con transición por defecto (fade negro)
+Glapi.scene_transition.change_scene("res://game/level_1.tscn")
+
+# Esperar a que termine la transición
+await Glapi.scene_transition.transition_finished
+
+# Con transición específica
+Glapi.scene_transition.change_scene_with_transition(
+    "res://game/main_menu.tscn",
+    "res://addons/Glapi/modules/scene_transition/transitions/fade_white.tscn"
+)
+
+# Con PackedScene
+var scene = load("res://game/level_1.tscn")
+Glapi.scene_transition.change_scene_to(scene)
+Glapi.scene_transition.change_scene_to_with_transition(scene, "res://addons/Glapi/modules/scene_transition/transitions/fade_white.tscn")
+```
+
+**Señales:**
+- `transition_started`: Inicia la transición
+- `transition_completed`: Termina la transición
+- `transition_finished`: Animación completamente terminada
+
+**Crear transiciones personalizadas:**
+1. Crea una escena `.tscn` con un CanvasLayer
+2. Añade un script que herede de `TransitionScene`
+3. Implementa `perform_transition(on_scene_change: Callable)`
+4. ¡Listo! Ya puedes usarla con `change_scene_with_transition()`
+
 ---
 
 ## Crear un Nuevo Adapter
@@ -111,5 +150,6 @@ var settings = Glapi.storage.load_data("settings")
 ## Notas
 
 - El autoload `Glapi` debe estar definido en `project.godot` o se registra automáticamente por el plugin
-- En desarrollo (PC), los adapters que传入 `null` usarán automáticamente sus Mocks
+- `Glapi.scene_transition` se inicializa automáticamente con Glapi.initialize()
+- En desarrollo (PC), los adapters que pasen `null` usarán automáticamente sus Mocks
 - Los eventos de analítica se envían automáticamente en segundo plano (ej. AdImpressionEvent)

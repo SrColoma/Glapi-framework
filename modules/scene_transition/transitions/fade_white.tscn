@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://fade_white_transition"]
+
+[ext_resource type="Script" path="res://addons/Glapi/modules/scene_transition/transitions/fade_white.gd" id="1_fade"]
+
+[node name="FadeWhite" type="CanvasLayer"]
+layer = 999
+script = ExtResource("1_fade")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(1, 1, 1, 1)
