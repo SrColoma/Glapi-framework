@@ -12,8 +12,5 @@ func get_value(section: String, key: String, default_val: Variant = null) -> Var
 	push_error("ISettingsAdapter: get_value() not implemented.")
 	return default_val
 
-func apply_all() -> void:
-	push_error("ISettingsAdapter: apply_all() not implemented.")
-
 func save() -> void:
 	push_error("ISettingsAdapter: save() not implemented.")
