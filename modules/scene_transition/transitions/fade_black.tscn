@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bu46ad8tvtb0a"]
 
-[ext_resource type="Script" uid="uid://bmke8jktmmqcd" path="res://addons/Glapi/modules/scene_transition/transitions/fade_black.gd" id="1_fade"]
+[ext_resource type="Script" uid="uid://bma5faxhbdi8p" path="res://addons/glapi/modules/scene_transition/transitions/fade_black.gd" id="1_fade"]
 
 [node name="FadeBlack" type="CanvasLayer" unique_id=1651759031]
 layer = 999

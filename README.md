@@ -103,8 +103,8 @@ var settings = Glapi.storage.load_data("settings")
 
 ```gdscript
 # Transiciones disponibles:
-# "res://addons/Glapi/modules/scene_transition/transitions/fade_black.tscn" (por defecto)
-# "res://addons/Glapi/modules/scene_transition/transitions/fade_white.tscn"
+# "res://addons/glapi/modules/scene_transition/transitions/fade_black.tscn" (por defecto)
+# "res://addons/glapi/modules/scene_transition/transitions/fade_white.tscn"
 
 # Cambiar escena con transición por defecto (fade negro)
 Glapi.scene_transition.change_scene("res://game/level_1.tscn")
@@ -115,13 +115,13 @@ await Glapi.scene_transition.transition_finished
 # Con transición específica
 Glapi.scene_transition.change_scene_with_transition(
     "res://game/main_menu.tscn",
-    "res://addons/Glapi/modules/scene_transition/transitions/fade_white.tscn"
+    "res://addons/glapi/modules/scene_transition/transitions/fade_white.tscn"
 )
 
 # Con PackedScene
 var scene = load("res://game/level_1.tscn")
 Glapi.scene_transition.change_scene_to(scene)
-Glapi.scene_transition.change_scene_to_with_transition(scene, "res://addons/Glapi/modules/scene_transition/transitions/fade_white.tscn")
+Glapi.scene_transition.change_scene_to_with_transition(scene, "res://addons/glapi/modules/scene_transition/transitions/fade_white.tscn")
 ```
 
 **Señales:**

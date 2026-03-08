@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://fade_white_transition"]
 
-[ext_resource type="Script" path="res://addons/Glapi/modules/scene_transition/transitions/fade_white.gd" id="1_fade"]
+[ext_resource type="Script" path="res://addons/glapi/modules/scene_transition/transitions/fade_white.gd" id="1_fade"]
 
 [node name="FadeWhite" type="CanvasLayer"]
 layer = 999

@@ -1,5 +1,4 @@
 class_name FadeBlack extends TransitionScene
-
 ## Transición de fundido a negro.
 
 var _color_rect: ColorRect = null

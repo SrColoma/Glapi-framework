@@ -8,21 +8,21 @@ class_name SceneTransitionManager extends Node
 ## ### Uso:
 ## ```gdscript
 ## # Cambio básico (usa la transición por defecto)
-## Glapi.scene_transition.change_scene("res://addons/Glapi/modules/scene_transition/transitions/fade_black.tscn")
+## Glapi.scene_transition.change_scene("res://addons/glapi/modules/scene_transition/transitions/fade_black.tscn")
 ##
 ## # Con await
 ## await Glapi.scene_transition.transition_finished
 ## print("¡Escena cargada!")
 ##
 ## # Con transición específica
-## Glapi.scene_transition.change_scene_with_transition("res://game/level1.tscn", "res://addons/Glapi/modules/scene_transition/transitions/fade_white.tscn")
+## Glapi.scene_transition.change_scene_with_transition("res://game/level1.tscn", "res://addons/glapi/modules/scene_transition/transitions/fade_white.tscn")
 ## ```
 
 signal scene_changed(new_scene_path: String)
 signal transition_started
 signal transition_finished
 
-const DEFAULT_TRANSITION := "res://addons/Glapi/modules/scene_transition/transitions/fade_black.tscn"
+const DEFAULT_TRANSITION := "res://addons/glapi/modules/scene_transition/transitions/fade_black.tscn"
 
 var _is_transitioning: bool = false
 var _scene_stack: Array[String] = []
@@ -75,8 +75,9 @@ func change_scene_with_transition(scene_path: String, transition_path: String, p
 	
 	var transition_scene = transition_res.instantiate()
 	
-	# Añadimos al árbol antes de ejecutar (para que _ready() se llame)
-	Engine.get_main_loop().root.add_child(transition_scene)
+	# Añadimos al árbol antes de ejecutar (para que _ready() se llame). Usamos call_deferred para evitar error en \`_ready\` de otra escena
+	Engine.get_main_loop().root.call_deferred("add_child", transition_scene)
+	await transition_scene.ready
 	
 	transition_scene.transition_finished.connect(func(): 
 		_on_transition_complete(scene_path)
@@ -136,7 +137,8 @@ func change_scene_to_with_transition(packed_scene: PackedScene, transition_path:
 		return
 	
 	var transition_scene = transition_res.instantiate()
-	Engine.get_main_loop().root.add_child(transition_scene)
+	Engine.get_main_loop().root.call_deferred("add_child", transition_scene)
+	await transition_scene.ready
 	
 	transition_scene.transition_finished.connect(func():
 		_on_transition_complete("")
