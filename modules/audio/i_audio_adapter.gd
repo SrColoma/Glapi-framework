@@ -4,7 +4,11 @@ signal audio_started(event_name: String)
 signal audio_stopped(event_name: String)
 
 func initialize() -> void:
-	push_error("IAudioAdapter: initialize() no implementado.")
+	pass
+
+func register_stream(event_name: String, stream: Variant) -> void:
+	push_warning("IAudioAdapter: Este adaptador no soporta el registro dinámico de streams. Ignite.")
+	pass
 
 func play_sfx(event_name: String, position: Vector3 = Vector3.ZERO) -> void:
 	push_error("IAudioAdapter: play_sfx() no implementado.")

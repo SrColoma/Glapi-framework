@@ -10,7 +10,7 @@ El módulo `SettingsService` es el responsable de exponer y guardar las configur
 ## 🚀 Uso en el Juego (`Service Layer`)
 
 Interactúa con la configuración usando el Singleton global `Glapi.settings`.
-Toda vez que uses un *Setter*, el motor gráfico aplicará el cambio en vivo (mutará el audio, cambiará la resolución, traducirá los textos) e instruirá a su Adaptador I/O a guardar el archivo.
+Este servicio actúa puramente como un **Almacén de Estado**. Al usar un *Setter*, el servicio guardará el cambio en disco local a través de su Adaptador I/O y **emitirá una señal (`setting_changed`)** para que otros sistemas (como `AudioService` o `GraphicsManager`) puedan reaccionar y aplicar el cambio físico real en el motor.
 
 ### 1. Control de Audio
 El servicio expone atajos convenientes para controlar los buses principales que deben estar creados en tu proyecto de Godot (`Master`, `Music`, `SFX`). 
@@ -26,12 +26,12 @@ if Glapi.settings.get_music_volume() < 0.2:
 ```
 
 ### 2. Control Visual (Pantalla Completa)
-Común en ports de PC o Web, permite encadenar el comportamiento a la API de DisplayServer.
-
-```gdscript
-func _on_chk_fullscreen_toggled(button_pressed: bool):
-	Glapi.settings.set_fullscreen(button_pressed)
-```
+Común en ports de PC o Web, te permite guardar la preferencia visual global. Recuerda que otro manager (ej: un `GraphicsManager` local) debe estar suscrito a la señal para aplicar el cambio en el `DisplayServer`.
+ 
+ ```gdscript
+ func _on_chk_fullscreen_toggled(button_pressed: bool):
+ 	Glapi.settings.set_fullscreen(button_pressed)
+ ```
 
 ### 3. Localización (Idiomas)
 Sincronizado con las tablas `.csv` nativas de Godot, cambia las variables al instante y las guarda para los reinicios posteriores.

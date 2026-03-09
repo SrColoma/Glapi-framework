@@ -28,7 +28,8 @@ func _inject_glapi(is_mobile_ready: bool) -> void:
 		"remote_config": null,
 		"iap": null,
 		"game_services": null,
-		"settings": null
+		"settings": null,
+		"audio": GodotAudioAdapter.new()
 	}
 	
 	Glapi.initialize(
@@ -39,7 +40,8 @@ func _inject_glapi(is_mobile_ready: bool) -> void:
 		adapters.get("remote_config"),
 		adapters.get("iap"),
 		adapters.get("game_services"),
-		adapters.get("settings")
+		adapters.get("settings"),
+		adapters.get("audio")
 	)
 	
 	print("🎮 BOOTSCREEN: Carga completada.")

@@ -50,6 +50,9 @@ func initialize(
 	_setup_settings(settings_prov if settings_prov else MockSettingsAdapter.new())
 	_setup_audio(audio_prov if audio_prov else GodotAudioAdapter.new())
 	
+	# Architecture Connection: Audio reacts to Settings Menu changes
+	audio.listen_to_settings(settings)
+	
 	print("⚙️ GLAPI: FRAMEWORK DE PRODUCCIÓN INICIALIZADO AL 100%.")
 
 func _setup_analytics(adapter: IAnalyticsAdapter) -> void:

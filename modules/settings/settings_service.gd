@@ -27,38 +27,18 @@ func apply_all() -> void:
 	var lang: String = get_value("localization", "language", TranslationServer.get_locale()) as String
 	TranslationServer.set_locale(lang)
 	
+	# Emitimos los valores iniciales para que el resto del sistema (Audio, Graphics) se sincronice
 	var is_full: bool = get_value("graphics", "fullscreen", false) as bool
-	if is_full:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-	else:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		
-	_apply_bus_volume("Master", get_value("audio", "master_volume", 1.0) as float)
-	_apply_bus_volume("SFX", get_value("audio", "sfx_volume", 1.0) as float)
-	_apply_bus_volume("Music", get_value("audio", "music_volume", 1.0) as float)
+	setting_changed.emit("graphics", "fullscreen", is_full)
+	
+	setting_changed.emit("audio", "master_volume", get_value("audio", "master_volume", 1.0))
+	setting_changed.emit("audio", "sfx_volume", get_value("audio", "sfx_volume", 1.0))
+	setting_changed.emit("audio", "music_volume", get_value("audio", "music_volume", 1.0))
 
 func _apply_single(section: String, key: String, value: Variant) -> void:
-	if section == "audio":
-		if key == "master_volume":
-			_apply_bus_volume("Master", value as float)
-		elif key == "sfx_volume":
-			_apply_bus_volume("SFX", value as float)
-		elif key == "music_volume":
-			_apply_bus_volume("Music", value as float)
-	elif section == "localization" and key == "language":
+	if section == "localization" and key == "language":
+		# La localización se puede considerar parte core o puede extraerse luego a un LocalizationManager
 		TranslationServer.set_locale(value as String)
-	elif section == "graphics" and key == "fullscreen":
-		var enabled: bool = value as bool
-		if enabled:
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		else:
-			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-
-func _apply_bus_volume(bus_name: String, linear_vol: float) -> void:
-	var bus_idx: int = AudioServer.get_bus_index(bus_name)
-	if bus_idx >= 0:
-		AudioServer.set_bus_volume_db(bus_idx, linear_to_db(linear_vol))
-		AudioServer.set_bus_mute(bus_idx, linear_vol <= 0.0)
 
 # Convenience Methods - Audio (Volumen Lineal 0.0 - 1.0)
 func set_master_volume(linear_volume: float) -> void:
@@ -90,10 +70,6 @@ func get_language() -> String:
 # Convenience Methods - Graphics
 func set_fullscreen(enabled: bool) -> void:
 	set_value("graphics", "fullscreen", enabled)
-	if enabled:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-	else:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 
 func is_fullscreen() -> bool:
 	return get_value("graphics", "fullscreen", false) as bool
