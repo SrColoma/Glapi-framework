@@ -1,34 +1,59 @@
 # Glapi Framework
 
-**Glapi** es un framework modular y desacoplado para Godot 4.x, diseñado para abstraer la comunicación con servicios de terceros como analíticas, anuncios (ads), almacenamiento, crashlytics, remote config, IAPs y game services.
+**Glapi** es un framework modular y desacoplado para Godot 4.x, diseñado para estandarizar y abstraer la estructura base de cualquier videojuego. 
 
-Su **arquitectura híbrida** combina el patrón **Adapter** (Servicio → Interfaz → Adapter), un **Bus de Eventos** para telemetría, y **Llamadas Asíncronas (`await`)** para interrupciones de UI, lo que permite un código de juego limpio, natural, testeable y agnóstico a los SDKs específicos que se utilicen.
+Su **arquitectura híbrida** combina el patrón **Adapter** (Servicio → Interfaz → Adapter), un **Bus de Eventos** tipado para telemetría, y **Llamadas Asíncronas (`await`)**, permitiendo un código de juego extremadamente limpio, natural, testeable y 100% agnóstico a las herramientas subyacentes.
+
+---
 
 ## Módulos Disponibles
 
-| Módulo | Servicio | Descripción |
-|--------|----------|-------------|
-| **Ads** | `Glapi.ads` | Anuncios (AdMob, Rewarded, Interstitial, Banner) |
-| **Analytics** | `Glapi.analytics` | Analítica (Firebase, Godotx) |
-| **Storage** | `Glapi.storage` | Almacenamiento local/híbrido |
-| **Crashlytics** | `Glapi.crashlytics` | Reporte de crashes (Firebase, Godotx) |
-| **Remote Config** | `Glapi.remote_config` | Configuración remota (Firebase) |
-| **IAP** | `Glapi.iap` | Compras in-app (Google Play Billing) |
-| **Game Services** | `Glapi.game_services` | Logros y leaderboards (Google Play Games) |
-| **Scene Transition** | `Glapi.scene_transition` | Transiciones de escena (fade, slide) |
+Glapi centraliza las herramientas más importantes de la producción de videojuegos bajo un único Autoload llamado `Glapi`.
 
-## Arquitectura
+| Módulo | Llamada | Descripción (Resumen) | Patrón Principal |
+|--------|---------|-----------------------|-------------|
+| **Ads** | `Glapi.ads` | Redes de Anuncios (AdMob, UnityAds) async. | Adapter |
+| **Analytics** | `Glapi.analytics` | Telemetría (Firebase, Godotx) fire-and-forget. | Adapter |
+| **Storage** | `Glapi.storage` | Almacenamiento local, cloud híbrido y encriptado. | Adapter |
+| **Crashlytics** | `Glapi.crashlytics` | Reporte automatizado de errores y crashes fatales. | Adapter |
+| **Remote Config**| `Glapi.remote_config`| AB Testing y switches en vivo. | Adapter |
+| **IAP** | `Glapi.iap` | Compras dentro de la aplicación (In-App Purchases). | Adapter |
+| **Game Services**| `Glapi.game_services`| Control de Logros y Tablas de Puntuación leaderboards.| Adapter |
+| **Settings** | `Glapi.settings` | Gestor de estado reactivo y local para el Menú de Opciones.| Adapter |
+| **Audio** | `Glapi.audio` | Motor acústico físico agnóstico (Godot Avanzado, FMOD, Wwise).| Adapter |
+| **Scene Transition**| `Glapi.scene_transition`| Cambios de pantalla corrutinados con fades. | Manager Directo |
+| **Overlays** | `Glapi.overlays` | Gestión Z-Index de Popups genéricos y menús modales. | Manager Directo |
+| **Time** | `Glapi.time` | Control del tiempo seguro anti-cheat y cronómetros offline. | Manager Directo |
+| **Input** | `Glapi.input` | Detector de plataformas en vivo (Mando/Táctil/PC) y vibración.| Manager Directo |
+| **Debug** | `Glapi.debug` | Consola flotante _in-game_ con comandos personalizados. | Manager Directo |
+| **Pooling** | `Glapi.pooling` | Object Pool ultrarrápido genérico para escupir miles de nodos. | Manager Directo |
+
+---
+
+## Componentes Activos (IA y Lógica)
+
+Además de los servicios globales (Autoloads), Glapi expone una carpeta de `components/` con Nodos listos para arrastrar y soltar a tus entidades, proveyendo arquitecturas de toma de decisiones robustas:
+
+- **FSM (Máquina de Estados Finitos)**: Para controladores de jugador simples, jefes con fases estáticas y animaciones de UI complejas.
+- **Behavior Tree (Árboles de Comportamiento)**: Para IA enemiga estándar, patrullajes, y NPCs reactivos jerárquicos. Incluye Decorators, Composites (Selector/Sequence) y Leaves base.
+- **GOAP (Goal-Oriented Action Planning)**: El pináculo de la IA dinámica. Para aldeanos, simuladores de vida y enemigos paramétricos complejos. Define estados del mundo ("Tiene Madera") y deja que los NPCs armen su propio plan en tiempo real. 
+
+---
+
+## Arquitectura (Capa de Servicios)
+
+Esta es la jerarquía de los módulos que requieren comunicación externa o configuraciones que pueden variar dependiendo de la plataforma de destino de nuestro juego.
 
 ```
 Juego → Glapi (Autoload) → Servicios → Adapters → SDKs
-                              ↓
-                        Mock Adapters (testing)
+                               ↓
+                         Mock Adapters (Desarrollo / PC / Testing)
 ```
 
-- **Servicio**: Lógica de negocio (ej. `AdsService`)
-- **Interfaz**: Define el contrato (ej. `IAdsAdapter`)
-- **Adapter**: Implementación real (ej. `PoingStudiosAdMobAdapter`)
-- **Mock Adapter**: Implementación para testing (ej. `MockAdsAdapter`)
+- **Servicio**: Lógica de negocio dura e inquebrantable (ej. `AudioService`)
+- **Interfaz**: Define el contrato con el mundo exterior (ej. `IAudioAdapter`)
+- **Adapter**: Implementación real (ej. `FmodAudioAdapter`, `GodotAudioAdapter`)
+- **Mock Adapter**: Implementación segura que no crashea en PC (ej. `MockAdsAdapter`)
 
 ---
 
@@ -37,119 +62,106 @@ Juego → Glapi (Autoload) → Servicios → Adapters → SDKs
 ### Git Submodule (Recomendado)
 ```bash
 mkdir addons
-git submodule add https://github.com/SrColoma/Glapi-framework.git addons/Glapi
+git submodule add https://github.com/SrColoma/Glapi-framework.git addons/glapi
 ```
 
 ### Activación
 1. Abre tu proyecto en Godot
 2. **Proyecto → Configuración del proyecto → Plugins**
 3. Activa **Glapi Framework**
-4. El autoload `Glapi` se registrará automáticamente
+4. El autoload `Glapi` se registrará y compilará automáticamente.
+
+### Herramienta: Generador de Proyecto Base
+
+Glapi incluye un script constructor que preparará la arquitectura de tu juego (las carpetas inmutables fuera de addons) automáticamente con un solo clic:
+
+1. Ve a `addons/glapi/tools/` en tu FileSystem.
+2. Haz clic derecho sobre **`project_generator.gd`** > **"Run"** (o Ejecutar).
+
+**¿Qué hace el Generador?**
+- Crea obligatoriamente `res://game/core/` y `res://game/screens/`.
+- Trae hacia fuera tu plantilla de *Product Requirements Document* (`PRD.md`) base.
+- Combina y crea tu **Splash Screen** interactiva (`res://game/screens/splash/splash_screen.tscn`) inyectando directamente el `auto_bootstrap.gd` (plantilla).
+- Fija esa nueva escena como el **Main Scene** del proyecto en la configuración del motor listos para Play (F5).
 
 ---
 
-## Uso Básico
+## Inicialización Obligatoria (Bootstrap)
 
-### Inicialización
+Dado que Glapi no sabe si quieres usar Firebase, GameAnalytics o nada, debes inyectarle sus dependencias tan pronto como arranque el juego (`_ready` de la primera pantalla `splash_screen.gd` o `auto_bootstrap.gd`):
 
 ```gdscript
 func _ready() -> void:
+    # Por parámetros ordinales, el framework te obliga a ser estricto.
     Glapi.initialize(
-        PoingStudiosAdMobAdapter.new(),    # Ads
+        null,                               # Ads (null cargará MockAds internamente)
         GodotxAnalyticsAdapter.new(),       # Analytics
-        null,                               # Storage (usa mock)
+        null,                               # Storage 
         GodotxCrashlyticsAdapter.new(),     # Crashlytics
-        null,                               # Remote Config (usa mock)
-        null,                               # IAP (usa mock)
-        null                                # Game Services (usa mock)
+        null,                               # Remote Config 
+        null,                               # IAP 
+        null,                               # Game Services 
+        null,                               # Settings 
+        GodotAudioAdapter.new()             # Audio (El motor físico de Godot proveído por Glapi)
     )
 ```
 
-### Analítica (Fire-and-Forget)
+> **Nota:** Todos los módulos tipo "Manager Directo" (`time`, `overlays`, `scene_transition`, etc.) se auto-construyen por detrás al llamar `initialize` y no requieren inyección de adaptadores al no interactuar con el exterior.
 
+---
+
+## Guía Visual Rápida de Uso
+
+### 🎵 Audio y Ajustes (Reactivo)
 ```gdscript
-Glapi.dispatch(LevelCompletedEvent.new(5, "normal"))
-Glapi.dispatch(AdImpressionEvent.new("banner", "home_screen", "USD", 0.50))
+# Nunca modificamos el bus volumétrico a mano. Le advertimos al Settings.
+Glapi.settings.set_master_volume(0.5)
+
+# AudioService (que escucha internamente a Settings) aplica el cambio físico para ti.
+Glapi.audio.play_sfx("shoot", player.global_position)
 ```
 
-### Anuncios (Asíncrono con await)
-
+### 📺 Anuncios (Asíncronos)
 ```gdscript
 func _on_revive_pressed() -> void:
-    get_tree().paused = true
-    
-    Glapi.ads.load_ad("rewarded", "ca-app-pub-xxx/yyy")
+    Glapi.ads.load_ad("rewarded", "ca-app-pub-xx")
     await Glapi.ads.ad_loaded
     
     Glapi.ads.show_ad("rewarded")
     await Glapi.ads.ad_closed
-    
-    get_tree().paused = false
 ```
 
-### Storage
-
+### 💾 Almacenamiento
 ```gdscript
 # Guardar
-Glapi.storage.save_data("settings", {"sound": true, "music": 0.8})
+Glapi.storage.save_data("game_record", {"score": 5000})
 
-# Cargar
-var settings = Glapi.storage.load_data("settings")
+# Cargar fuerte
+var rec = Glapi.storage.load_data("game_record")
 ```
 
-### Transiciones de Escena
-
-**SceneTransition** es parte de Glapi (`Glapi.scene_transition`). No requiere inicialización separate, se configura automáticamente.
-
+### 🎬 Transiciones 
 ```gdscript
-# Transiciones disponibles:
-# "res://addons/glapi/modules/scene_transition/transitions/fade_black.tscn" (por defecto)
-# "res://addons/glapi/modules/scene_transition/transitions/fade_white.tscn"
-
-# Cambiar escena con transición por defecto (fade negro)
+# Cambiar la escena limpiamente esperando a que el telón cierre
 Glapi.scene_transition.change_scene("res://game/level_1.tscn")
-
-# Esperar a que termine la transición
 await Glapi.scene_transition.transition_finished
-
-# Con transición específica
-Glapi.scene_transition.change_scene_with_transition(
-    "res://game/main_menu.tscn",
-    "res://addons/glapi/modules/scene_transition/transitions/fade_white.tscn"
-)
-
-# Con PackedScene
-var scene = load("res://game/level_1.tscn")
-Glapi.scene_transition.change_scene_to(scene)
-Glapi.scene_transition.change_scene_to_with_transition(scene, "res://addons/glapi/modules/scene_transition/transitions/fade_white.tscn")
 ```
 
-**Señales:**
-- `transition_started`: Inicia la transición
-- `transition_completed`: Termina la transición
-- `transition_finished`: Animación completamente terminada
+---
 
-**Crear transiciones personalizadas:**
-1. Crea una escena `.tscn` con un CanvasLayer
-2. Añade un script que herede de `TransitionScene`
-3. Implementa `perform_transition(on_scene_change: Callable)`
-4. ¡Listo! Ya puedes usarla con `change_scene_with_transition()`
+## Estructura para crear Modos Personalizados
+
+Para inyectar tu propia pasarela externa de SDKs (Ej: Cambiar Godotx Crashlytics por Sentry, o GodotAudio por Wwise):
+1. Crea tu archivo en la carpeta adaptadores basándote en la interfaz exigible: `modules/<modulo>/adapters/mi_nuevo_adapter.gd` `extends I<Modulo>Adapter`
+2. En tu archivo del juego Boot (`auto_bootstrap.gd`), reemplaza la instanciación:
+```gdscript
+    Glapi.initialize(
+        # ..., 
+        MiNuevoCrashlyticsAdapter.new() # ← Así de fácil.
+    )
+```
 
 ---
 
-## Crear un Nuevo Adapter
-
-1. Crea la interfaz en `modules/<modulo>/i_<modulo>_adapter.gd`
-2. Crea el servicio en `modules/<modulo>/<modulo>_service.gd`
-3. Crea el mock en `modules/<modulo>/adapters/mock_<modulo>_adapter.gd`
-4. Crea el adapter real en `modules/<modulo>/adapters/real_<modulo>_adapter.gd`
-5. Registra en `auto_Glapi.gd`
-
----
-
-## Notas
-
-- El autoload `Glapi` debe estar definido en `project.godot` o se registra automáticamente por el plugin
-- `Glapi.scene_transition` se inicializa automáticamente con Glapi.initialize()
-- En desarrollo (PC), los adapters que pasen `null` usarán automáticamente sus Mocks
-- Los eventos de analítica se envían automáticamente en segundo plano (ej. AdImpressionEvent)
+## Licencia
+*Desarrollado internamente para la aceleración y modularización agnóstica de sistemas de videojuegos.*
