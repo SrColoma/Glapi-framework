@@ -1,6 +1,6 @@
-# Glapi Framework
+# Game Launch Acceleration Pipeline (Glapi)
 
-**Glapi** es un framework modular y desacoplado para Godot 4.x, diseñado para estandarizar y abstraer la estructura base de cualquier videojuego. 
+**Glapi Framework** es un framework modular y desacoplado para Godot 4.x, diseñado para estandarizar y abstraer la estructura base de cualquier videojuego. 
 
 Su **arquitectura híbrida** combina el patrón **Adapter** (Servicio → Interfaz → Adapter), un **Bus de Eventos** tipado para telemetría, y **Llamadas Asíncronas (`await`)**, permitiendo un código de juego extremadamente limpio, natural, testeable y 100% agnóstico a las herramientas subyacentes.
 
@@ -46,8 +46,8 @@ Esta es la jerarquía de los módulos que requieren comunicación externa o conf
 
 ```
 Juego → Glapi (Autoload) → Servicios → Adapters → SDKs
-                               ↓
-                         Mock Adapters (Desarrollo / PC / Testing)
+							   ↓
+						 Mock Adapters (Desarrollo / PC / Testing)
 ```
 
 - **Servicio**: Lógica de negocio dura e inquebrantable (ej. `AudioService`)
@@ -92,18 +92,18 @@ Dado que Glapi no sabe si quieres usar Firebase, GameAnalytics o nada, debes iny
 
 ```gdscript
 func _ready() -> void:
-    # Por parámetros ordinales, el framework te obliga a ser estricto.
-    Glapi.initialize(
-        null,                               # Ads (null cargará MockAds internamente)
-        GodotxAnalyticsAdapter.new(),       # Analytics
-        null,                               # Storage 
-        GodotxCrashlyticsAdapter.new(),     # Crashlytics
-        null,                               # Remote Config 
-        null,                               # IAP 
-        null,                               # Game Services 
-        null,                               # Settings 
-        GodotAudioAdapter.new()             # Audio (El motor físico de Godot proveído por Glapi)
-    )
+	# Por parámetros ordinales, el framework te obliga a ser estricto.
+	Glapi.initialize(
+		null,                               # Ads (null cargará MockAds internamente)
+		GodotxAnalyticsAdapter.new(),       # Analytics
+		null,                               # Storage 
+		GodotxCrashlyticsAdapter.new(),     # Crashlytics
+		null,                               # Remote Config 
+		null,                               # IAP 
+		null,                               # Game Services 
+		null,                               # Settings 
+		GodotAudioAdapter.new()             # Audio (El motor físico de Godot proveído por Glapi)
+	)
 ```
 
 > **Nota:** Todos los módulos tipo "Manager Directo" (`time`, `overlays`, `scene_transition`, etc.) se auto-construyen por detrás al llamar `initialize` y no requieren inyección de adaptadores al no interactuar con el exterior.
@@ -124,11 +124,11 @@ Glapi.audio.play_sfx("shoot", player.global_position)
 ### 📺 Anuncios (Asíncronos)
 ```gdscript
 func _on_revive_pressed() -> void:
-    Glapi.ads.load_ad("rewarded", "ca-app-pub-xx")
-    await Glapi.ads.ad_loaded
-    
-    Glapi.ads.show_ad("rewarded")
-    await Glapi.ads.ad_closed
+	Glapi.ads.load_ad("rewarded", "ca-app-pub-xx")
+	await Glapi.ads.ad_loaded
+	
+	Glapi.ads.show_ad("rewarded")
+	await Glapi.ads.ad_closed
 ```
 
 ### 💾 Almacenamiento
@@ -155,10 +155,10 @@ Para inyectar tu propia pasarela externa de SDKs (Ej: Cambiar Godotx Crashlytics
 1. Crea tu archivo en la carpeta adaptadores basándote en la interfaz exigible: `modules/<modulo>/adapters/mi_nuevo_adapter.gd` `extends I<Modulo>Adapter`
 2. En tu archivo del juego Boot (`auto_bootstrap.gd`), reemplaza la instanciación:
 ```gdscript
-    Glapi.initialize(
-        # ..., 
-        MiNuevoCrashlyticsAdapter.new() # ← Así de fácil.
-    )
+	Glapi.initialize(
+		# ..., 
+		MiNuevoCrashlyticsAdapter.new() # ← Así de fácil.
+	)
 ```
 
 ---
