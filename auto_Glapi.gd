@@ -14,7 +14,8 @@ var time: TimeManager
 var input: InputDeviceDetector
 var debug: DebugConsoleService
 var settings: SettingsService
-
+var pooling: ObjectPoolService
+var audio: AudioService
 
 # 1. ANALÍTICA
 func dispatch(event: GlapiEvent) -> void:
@@ -32,7 +33,8 @@ func initialize(
 	remote_config_prov: IRemoteConfigAdapter = null,
 	iap_prov: IIAPAdapter = null,
 	game_services_prov: IGameServicesAdapter = null,
-	settings_prov: ISettingsAdapter = null
+	settings_prov: ISettingsAdapter = null,
+	audio_prov: IAudioAdapter = null
 ) -> void:
 	
 	_setup_ads(ads_prov if ads_prov else MockAdsAdapter.new())
@@ -46,6 +48,7 @@ func initialize(
 	_setup_input_detector()
 	_setup_debug_console()
 	_setup_settings(settings_prov if settings_prov else MockSettingsAdapter.new())
+	_setup_audio(audio_prov if audio_prov else GodotAudioAdapter.new())
 	
 	print("⚙️ GLAPI: FRAMEWORK DE PRODUCCIÓN INICIALIZADO AL 100%.")
 
@@ -90,7 +93,10 @@ func _setup_scene_transition() -> void:
 	# TimeManager requiere el storage service pero Glapi lo asegura arriba
 	time.initialize(storage)
 	
-	print("⚙️ FRAMEWORK: Scene Transition, Overlays & Time inicializados")
+	pooling = ObjectPoolService.new()
+	add_child(pooling)
+	
+	print("⚙️ FRAMEWORK: Scene Transition, Overlays, Time & Object Pooling inicializados")
 
 func _setup_input_detector() -> void:
 	input = InputDeviceDetector.new()
@@ -107,3 +113,7 @@ func _setup_debug_console() -> void:
 func _setup_settings(adapter: ISettingsAdapter) -> void:
 	settings = SettingsService.new(adapter)
 	print("⚙️ FRAMEWORK: Settings conectado usando ", adapter.get_class())
+
+func _setup_audio(adapter: IAudioAdapter) -> void:
+	audio = AudioService.new(adapter)
+	print("⚙️ FRAMEWORK: Audio conectado usando ", adapter.get_class())

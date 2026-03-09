@@ -17,15 +17,16 @@ var _ui_scene: PackedScene = preload("res://addons/glapi/modules/debug/view_debu
 func _ready() -> void:
 	# Podríamos instanciarla inactiva e inyectarla al OverlayManager,
 	# pero como es solo dev/QA, mejor la manejamos directamente.
-	_ui_instance = _ui_scene.instantiate()
-	_ui_instance.visible = false
-	
-	var canvas = CanvasLayer.new()
-	canvas.layer = 999  # Encima de todo, incluyendo modales y transiciones
-	canvas.add_child(_ui_instance)
-	
-	# Asegurarnos de que no se muera al cambiar de escena
-	Engine.get_main_loop().root.call_deferred("add_child", canvas)
+	if OS.is_debug_build():
+		_ui_instance = _ui_scene.instantiate()
+		_ui_instance.visible = false
+		
+		var canvas = CanvasLayer.new()
+		canvas.layer = 999  # Encima de todo, incluyendo modales y transiciones
+		canvas.add_child(_ui_instance)
+		
+		# Asegurarnos de que no se muera al cambiar de escena
+		Engine.get_main_loop().root.call_deferred("add_child", canvas)
 	
 	# Comandos por defecto
 	register_command("help", _cmd_help, "Muestra esta ayuda.")
@@ -89,7 +90,7 @@ func setup_glapi_commands() -> void:
 
 func _input(event: InputEvent) -> void:
 	# Abrir con la tecla que suele estar debajo de ESC (Backquote/Tile)
-	if event is InputEventKey and event.pressed and event.keycode == KEY_QUOTELEFT:
+	if OS.is_debug_build() and event is InputEventKey and event.pressed and event.keycode == KEY_QUOTELEFT:
 		toggle_console()
 		get_viewport().set_input_as_handled()
 

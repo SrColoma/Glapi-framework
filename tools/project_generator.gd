@@ -5,10 +5,7 @@ class_name GlapiProjectGenerator
 const GAME_DIR = "res://game/"
 const DIRS_TO_CREATE = [
 	"core",
-	"entities",
-	"screens",
-	"resources",
-	"resources/assets"
+	"screens"
 ]
 
 static func generate_base_structure() -> void:
